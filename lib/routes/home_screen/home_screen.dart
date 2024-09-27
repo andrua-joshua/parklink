@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:parklink/module/parking.dart';
+import 'package:parklink/providers/booking_provider.dart';
+import 'package:parklink/providers/parking_provider.dart';
+import 'package:parklink/providers/user_provider.dart';
 import 'package:parklink/route.dart';
 import 'package:parklink/routes/home_screen/widgets/home_screen_widgets.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -29,7 +34,9 @@ class HomeScreenState extends State<HomeScreen>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Consumer3<UserProvider, BookingProvider, ParkingProvider>(
+      builder: (context, valueU, valueB, valueP, child)
+       => Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -130,18 +137,44 @@ class HomeScreenState extends State<HomeScreen>{
                   ),
                   const SizedBox(height: 15,),
                   SizedBox(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(
-                          3, (x)=> Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: UnitRecentPlaces(
-                              onClick: (){
-                                Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen);
-                                }, label: types[x]),)),
-                      ),
-                    ),
+                    child: FutureBuilder<List<Parking>>(
+                      future: valueP.parkingRespository.getAllParkings(), 
+                      builder: (context, snapshot) {
+                        
+                        if(snapshot.hasData){
+                          final data =  snapshot.data;
+
+                          return data!.length>0? SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                  data!.length>3? 3: data.length , (x)=> Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: UnitRecentPlaces(
+                                      parking: data[x],
+                                      onClick: (){
+                                        Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen, arguments: {
+                                            "x1": false,
+                                            "parking": data[x]
+                                          });
+                                        }),)),
+                              ),
+                            ): const SizedBox(height: 70, child: Center(child:Text("No Parking available")),);
+                        }
+
+                        if(snapshot.hasError){
+                          return const SizedBox(height: 70, child: Center(child:Text("Failed to fetch Parkings")),);
+                        }
+
+
+
+                        return const Center(
+                          child: SizedBox(
+                            height: 40, width: 40,
+                            child: CircularProgressIndicator(),
+                            ),
+                        );
+                      },)
                   ),
 
                   const SizedBox(height: 25,),
@@ -158,21 +191,49 @@ class HomeScreenState extends State<HomeScreen>{
                   ),
                   const SizedBox(height: 15,),
                   SizedBox(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(
-                          3, (x)=> Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: UnitRecentPlaces(
-                              onClick: ()=> Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen), label: types[x]),)),
-                      ),
-                    ),
+                    child: FutureBuilder<List<Parking>>(
+                      future: valueP.parkingRespository.getAllParkings(), 
+                      builder: (context, snapshot) {
+                        
+                        if(snapshot.hasData){
+                          final data =  snapshot.data;
+
+                          return data!.length>0? SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                  data!.length>3? 3: data.length , (x)=> Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: UnitRecentPlaces(
+                                      parking: data[x],
+                                      onClick: (){
+                                        Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen, arguments: {
+                                            "x1": false,
+                                            "parking": data[x]
+                                          });
+                                        }),)),
+                              ),
+                            ):const SizedBox(height: 70, child: Center(child:Text("No Parking available")),);
+                        }
+
+                        if(snapshot.hasError){
+                          return const SizedBox(height: 70, child: Center(child:Text("Failed to fetch Parkings")),);
+                        }
+
+
+
+                        return const Center(
+                          child: SizedBox(
+                            height: 40, width: 40,
+                            child: CircularProgressIndicator(),
+                            ),
+                        );
+                      },)
                   ),
                 ],
               ),)
           ],
         ))),
-    );
+    ),);
   }
 }

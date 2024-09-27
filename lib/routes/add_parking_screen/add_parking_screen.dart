@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:parklink/providers/parking_provider.dart';
+import 'package:parklink/providers/user_provider.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 import 'package:parklink/utils/app_text_input_fields.dart';
 import 'package:parklink/utils/buttons.dart';
+import 'package:provider/provider.dart';
 
 class AddParkingScreen extends StatefulWidget{
   const AddParkingScreen({super.key});
@@ -25,10 +29,10 @@ class AddParkingScreenState extends State<AddParkingScreen>{
   late final TextEditingController carCostController;
   late final TextEditingController bikeCostController;
   late final TextEditingController truckCostController;
-  late final TextEditingController longController;
-  late final TextEditingController latController;
+  late final TextEditingController locationController;
 
 
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -42,8 +46,7 @@ class AddParkingScreenState extends State<AddParkingScreen>{
     bikeCostController = TextEditingController();
     truckCostController = TextEditingController();
 
-    longController = TextEditingController();
-    latController = TextEditingController();
+    locationController = TextEditingController();
 
   }
 
@@ -59,14 +62,15 @@ class AddParkingScreenState extends State<AddParkingScreen>{
     carCostController.dispose();
     truckCostController.dispose();
     bikeCostController.dispose();
-    longController.dispose();
-    latController.dispose();
+    locationController.dispose();
   }
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Consumer2<UserProvider, ParkingProvider>(
+      builder: (context, value, value2, child)
+       =>  Scaffold(
       backgroundColor: AppColors.softWhiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -105,6 +109,20 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                     borderRadius: 20, 
                     btnHeight: 45, 
                     controller: titleController),
+                  const SizedBox(height: 10,),
+                  const Text(
+                    "Parking location",
+                    style: AppStyles.normalBlackTextStyle,
+                  ),
+                  const SizedBox(height: 10,),
+                  DSolidTextInputField(
+                    hintText: "Parking location", 
+                    hintTextStyle: AppStyles.normalGreyTextStyle, 
+                    valueTextStyle: AppStyles.normalBlackTextStyle, 
+                    bgColor: Colors.white, 
+                    borderRadius: 20, 
+                    btnHeight: 45, 
+                    controller: locationController),
                   const SizedBox(height: 40,),
                   const Text(
                     "Slots",
@@ -283,7 +301,7 @@ class AddParkingScreenState extends State<AddParkingScreen>{
 
                     child: Row(
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             "Bike Slots Cost",
                             style: AppStyles.normalBlackTextStyle,
@@ -303,23 +321,83 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
-                  DSolidButton(
-                    label: "Select location", 
-                    btnHeight: 45, 
-                    bgColor: AppColors.primaryColor3, 
-                    borderRadius: 20, 
-                    textStyle: AppStyles.normalWhiteTextStyle, 
-                    onClick: (){}),
+                  
 
                   const SizedBox(height: 20,),
-                  DSolidButton(
+                  isLoading?
+                  const Center(
+                    child: SizedBox(
+                      height: 40,
+                      width: 40,
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                  : DSolidButton(
                     label: "Add Parking", 
                     btnHeight: 45, 
                     bgColor: AppColors.primaryColor, 
                     borderRadius: 20, 
                     textStyle: AppStyles.normalWhiteTextStyle, 
-                    onClick: (){}),
+                    onClick: ()async{
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    /**
+                     * late final TextEditingController titleController;
+                        late final TextEditingController carSlotsController;
+                        late final TextEditingController bikeSlotsController;
+                        late final TextEditingController truckSlotsController;
+                        late final TextEditingController carCostController;
+                        late final TextEditingController bikeCostController;
+                        late final TextEditingController truckCostController;
+                        late final TextEditingController locationController;
+                     */
+
+                    if(titleController.text.isNotEmpty
+                     && carSlotsController.text.isNotEmpty
+                     && bikeSlotsController.text.isNotEmpty
+                     && truckSlotsController.text.isNotEmpty
+                     && carCostController.text.isNotEmpty
+                     && bikeCostController.text.isNotEmpty
+                     && truckCostController.text.isNotEmpty
+                     && locationController.text.isNotEmpty ){
+
+
+                        final parking =  await value2.parkingRespository.addParking(
+                          title: titleController.text, 
+                          carSlots: int.parse(carSlotsController.text), 
+                          truckSlots: int.parse(truckSlotsController.text), 
+                          bikeSlots: int.parse(bikeSlotsController.text), 
+                          carNightCost: double.parse(carCostController.text), 
+                          truckNightCost: double.parse(truckCostController.text), 
+                          bikeNightCost: double.parse(bikeCostController.text), 
+                          location: locationController.text, 
+                          userId: value.user!.id);
+
+                        
+
+                        final user = await value.authRepository.fetchUser(
+                          userId: value.user!.id
+                        );
+                        
+                        if(user!=null){
+                          value.user = user;
+                          value.notifyAll();
+                          Navigator.pop(context);
+                        }else{
+                          Navigator.pop(context);
+                        }
+                    }else{
+                      Fluttertoast.showToast(msg: "Fill in the fields");
+                    }
+
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                    
+                  }),
 
                   const SizedBox(height: 20,),
 
@@ -327,6 +405,6 @@ class AddParkingScreenState extends State<AddParkingScreen>{
               )),
           ),)),
 
-    );
+    ),);
   }
 }

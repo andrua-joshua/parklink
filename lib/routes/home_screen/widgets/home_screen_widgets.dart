@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parklink/module/parking.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 
@@ -96,9 +97,9 @@ class UnitCarTypeState extends State<UnitCarType>{
 
 class UnitRecentPlaces extends StatefulWidget{
   final Function() onClick;
-  final String label;
+  final Parking parking;
   const UnitRecentPlaces({
-    super.key, required this.onClick, required this.label});
+    super.key, required this.onClick, required this.parking});
 
 
   @override
@@ -132,22 +133,29 @@ class UnitRecentPlacesState extends State<UnitRecentPlaces>{
               children: [
                 Expanded(
                   child:Text(
-                  widget.label, style: AppStyles.normalBoldPrimaryTextStyle,)),
+                  widget.parking.title, style: AppStyles.normalBoldPrimaryTextStyle,)),
                 const SizedBox(width: 10,),
                 const Icon(Icons.arrow_forward_ios_outlined)
               ],
             ),
           ),
-          const SizedBox(
+          SizedBox(
             child: Row(
               children: [
                 const Icon(Icons.location_on),
                 const SizedBox(width: 10,),
-                Expanded(child:Text("Nakawa Katz Pl", style: AppStyles.normalGreyTextStyle,))
+                Expanded(child:Text(widget.parking.location, style: AppStyles.normalGreyTextStyle,))
               ],
             ),
           ),
-          const Expanded(child: SizedBox())
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage("assets/map.jpg"))
+              ),
+            ))
         ],
       ),
     ));

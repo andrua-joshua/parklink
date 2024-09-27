@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:parklink/providers/user_provider.dart';
 import 'package:parklink/route.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 import 'package:parklink/utils/app_text_input_fields.dart';
 import 'package:parklink/utils/buttons.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget{
   const LoginScreen({super.key});
@@ -20,6 +23,8 @@ class LoginScreenState extends State<LoginScreen>{
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   final GlobalKey<FormState> key = GlobalKey<FormState>();
+
+  bool isLoading = false;
 
 
   @override
@@ -41,7 +46,9 @@ class LoginScreenState extends State<LoginScreen>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Consumer<UserProvider>(
+      builder: (context, value, child)
+       => Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         centerTitle:  true,
@@ -80,13 +87,47 @@ class LoginScreenState extends State<LoginScreen>{
                   btnHeight: 45, 
                   controller: passwordController),
                 const SizedBox(height: 40,),
-                DSolidButton(
+                isLoading?
+                const Center(
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+                : DSolidButton(
                   label: "Login", 
                   btnHeight: 45, 
                   bgColor: AppColors.primaryColor, 
                   borderRadius: 15, 
                   textStyle: AppStyles.normalWhiteTextStyle, 
-                  onClick: ()=> Navigator.pushNamed(context, RouteGenerator.homeScreen) ),
+                  onClick: ()async{
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    if(emailController.text.isNotEmpty
+                     && passwordController.text.isNotEmpty){
+
+                        final user = await value.authRepository.login(
+                          email: emailController.text, 
+                          password: passwordController.text);
+                        
+                        if(user!=null){
+                          value.user = user;
+                          value.notifyAll();
+                          Navigator.pushNamed(context, RouteGenerator.homeScreen);
+                        }
+                    }else{
+                      Fluttertoast.showToast(msg: "Fill in the fields");
+                    }
+
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                    
+                  } ),
 
                 const SizedBox(height: 20,),
                 DOutlinedButton(
@@ -99,7 +140,7 @@ class LoginScreenState extends State<LoginScreen>{
               ],
             )),
           ),)),
-    );
+    ),);
   }
 
 }

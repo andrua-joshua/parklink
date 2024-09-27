@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parklink/module/parking.dart';
 import 'package:parklink/routes/add_parking_screen/add_parking_screen.dart';
 import 'package:parklink/routes/all_parkings_screen/all_parkings_screen.dart';
 import 'package:parklink/routes/bookings_screen/bookings_screen.dart';
@@ -44,11 +45,12 @@ class RouteGenerator{
           builder: (_) => BookingsScreen(isUserParking: arg??false));
       
       case parkingDetailsScreen:
-        bool? arg;
+        Map<String, dynamic>? arg;
         if(settings.arguments!=null)
-          arg = settings.arguments as bool;
+          arg = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-          builder: (_) =>  ParkingDetailsScreen(isMyParking: arg??false,));
+          builder: (_) =>  ParkingDetailsScreen(
+            isMyParking: arg!['x1'] as bool, parking: arg['parking'] as Parking,));
       
       case homeScreen:
         return MaterialPageRoute(

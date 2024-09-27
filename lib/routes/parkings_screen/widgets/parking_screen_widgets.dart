@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:parklink/module/parking.dart';
 import 'package:parklink/route.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 
 class UnitUserParkingItem extends StatelessWidget{
-  const UnitUserParkingItem({super.key});
+  final Parking parking;
+  const UnitUserParkingItem({super.key, required this.parking});
 
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen, arguments: true),
+      onTap: () => Navigator.pushNamed(context, RouteGenerator.parkingDetailsScreen, arguments: {
+        "x1": true,
+        "parking": parking
+      }),
       child:Container(
       constraints: const BoxConstraints.expand(height: 100),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: AppColors.softWhiteColor
+        color: Color.fromARGB(255, 247, 246, 246)
       ),
       margin: const EdgeInsets.symmetric(vertical: 10),
 
@@ -25,18 +30,21 @@ class UnitUserParkingItem extends StatelessWidget{
             constraints: const BoxConstraints.expand(width: 100),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Colors.white
+              color: Colors.white,
+              image: const DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage("assets/map.jpg"))
             ),    
           ),
           const SizedBox(width: 10,),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 const SizedBox(height: 10,),
                 Text(
-                  "Nutz parking Av", 
+                  parking.title, 
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppStyles.normalBoldPrimaryTextStyle,),
@@ -46,7 +54,7 @@ class UnitUserParkingItem extends StatelessWidget{
                     children: [
                       Icon(Icons.location_on),
                       SizedBox(width: 5,),
-                      Text("Nakawa frontWard", style: AppStyles.normalGreyTextStyle, maxLines: 1,)
+                      Text(parking.location, style: AppStyles.normalGreyTextStyle, maxLines: 1,)
                     ],
                   ),
                 ),
@@ -59,15 +67,15 @@ class UnitUserParkingItem extends StatelessWidget{
               ],
             ) ),
             const SizedBox(width: 10,),
-            const SizedBox(
+            SizedBox(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "13",
+                    "${parking.bookings.length}",
                     style: AppStyles.bigBoldPrimaryTextStyle,),
                   const SizedBox(height: 3,),
-                  Text(
+                  const Text(
                     "Bookings",
                     style: AppStyles.smallGreyTextStyle,
                   )
