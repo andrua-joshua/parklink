@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -30,7 +31,7 @@ class ParkingsMapScreenState extends State<ParkingsMapScreen>{
 
     _kGooglePlex = const CameraPosition(
       target:  LatLng(0.3491314, 32.6621247),
-      zoom: 1.4746,
+      zoom: 14.4746,
     );
   }
       
@@ -79,6 +80,7 @@ class ParkingsMapScreenState extends State<ParkingsMapScreen>{
     => parkings.map(
       (element)=> Marker(
         markerId: MarkerId("${element.id}"),
+        position: LatLng(element.lat,element.lng),
         infoWindow: InfoWindow(
           title: element.title,
           snippet: element.location

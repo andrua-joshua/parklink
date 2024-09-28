@@ -7,13 +7,14 @@ import 'package:parklink/module/parking.dart';
 class ParkingRespository{
 
   Future<List<Parking>> getAllParkings()async{
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/all");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/parking/all");
     // final uri = Uri.parse("http://localhost:5000/api/v1/parking/all");
 
     try{
       final res = await http.get(uri);
 
       if(res.statusCode == 200){
+        print(":::::: the parkings:  ${res.body}");
         final data = jsonDecode(res.body);
         return (data as List<dynamic>).map(
           (eleement)=> Parking.fromJson(eleement)
@@ -31,7 +32,7 @@ class ParkingRespository{
   Future<void> deleteParking({
     required int parkingId
   }) async{
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/delete/$parkingId");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/parking/delete/$parkingId");
     // final uri = Uri.parse("http://localhost:5000/api/v1/parking/delete/$parkingId");
     try{
       final res = await http.delete(uri);
@@ -65,7 +66,7 @@ class ParkingRespository{
     required double lng,
     required double lat
   }) async{
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/add");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/parking/add");
     // final uri = Uri.parse("http://localhost:5000/api/v1/parking/add");
 
     final payload = {

@@ -365,13 +365,15 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                      && truckCostController.text.isNotEmpty
                      && locationController.text.isNotEmpty ){
 
-                        LocationModule? location;
+                        // LocationModule? location;
 
-                        try{
-                          location = await GeolocationServiceGeolocatorApi().getCurrentLocation();
-                        }catch(err){
-                          Fluttertoast.showToast(msg: "Failed to get location:: $err");
-                        }
+                        // try{
+                          final location = await GeolocationServiceGeolocatorApi().getCurrentLocation();
+                        // }catch(err){
+                        //   Fluttertoast.showToast(msg: "Failed to get location:: $err");
+                        // }
+
+                        print(":::: Location:   Lat:${location.lat}   Long:${location.long}");
                         
                         final parking =  await value2.parkingRespository.addParking(
                           title: titleController.text, 
@@ -383,8 +385,8 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                           bikeNightCost: double.parse(bikeCostController.text), 
                           location: locationController.text, 
                           userId: value.user!.id,
-                          lng: location?.long?? 32.6621247,
-                          lat: location?.lat??0.3491314);
+                          lng: location.long,
+                          lat: location.lat);
 
                         
                           print(":::: Finished adding the parking");

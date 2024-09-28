@@ -57,7 +57,7 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
 
     _kGooglePlex = CameraPosition(
       target:  LatLng(widget.parking.lat, widget.parking.lng),
-      zoom: 1.4746,
+      zoom: 14.4746,
     );
   }
 
@@ -113,6 +113,7 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
                   markers: {
                     Marker(
                       markerId: MarkerId("${widget.parking.id}"),
+                      position: LatLng(widget.parking.lat,widget.parking.lng),
                       infoWindow: InfoWindow(
                         title: widget.parking.title,
                         snippet: widget.parking.location

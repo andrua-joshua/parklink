@@ -10,7 +10,7 @@ class BookingRepository{
     required int userId
   })async{
     print("::::::::::::User booking::   ");
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/bookings/$userId");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/bookings/$userId");
     // final uri = Uri.parse("http://localhost:5000/api/v1/bookings/$userId");
     try{
       final res = await http.get(
@@ -39,7 +39,7 @@ class BookingRepository{
   })async{
 
     print("::::::::::::Parking booking::   ");
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/bookings/parking/$parkingId");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/bookings/parking/$parkingId");
     // final uri = Uri.parse("http://localhost:5000/api/v1/bookings/parking/$parkingId");
     try{
       final res = await http.get(
@@ -72,7 +72,7 @@ class BookingRepository{
     required DateTime startDate,
     required int parkingId
   })async{
-    final uri = Uri.parse("http://154.72.206.212:5000/api/v1/bookings/makeBooking");
+    final uri = Uri.parse("http://154.72.206.212:5000/api/v2/bookings/makeBooking");
     // final uri = Uri.parse("http://localhost:5000/api/v1/bookings/makeBooking");
 
     /**
