@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parklink/module/parking.dart';
 import 'package:parklink/routes/add_parking_screen/add_parking_screen.dart';
 import 'package:parklink/routes/all_parkings_screen/all_parkings_screen.dart';
@@ -7,6 +8,7 @@ import 'package:parklink/routes/home_screen/home_screen.dart';
 import 'package:parklink/routes/login_screen/login_screen.dart';
 import 'package:parklink/routes/navigator_screen/navigator_screen.dart';
 import 'package:parklink/routes/parking_details_screen/parking_details_screen.dart';
+import 'package:parklink/routes/parkings_map_screen/parkings_map_screen.dart';
 import 'package:parklink/routes/signup_screen/signup_screen.dart';
 
 class RouteGenerator{
@@ -19,6 +21,8 @@ class RouteGenerator{
 
   static const String bookingsScreen = "/bookingsScreen";
   static const String addParkingScreen = "/addParkingScreen";
+
+  static const String parkingMapScreen = "/parkingMapScreen";
 
 
 
@@ -36,6 +40,10 @@ class RouteGenerator{
       case addParkingScreen:
         return MaterialPageRoute(
           builder: (_) => const AddParkingScreen());
+
+      case parkingMapScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ParkingsMapScreen());
 
       case bookingsScreen:
         bool? arg;

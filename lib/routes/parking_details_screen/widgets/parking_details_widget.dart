@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:parklink/module/parking.dart';
 import 'package:parklink/providers/booking_provider.dart';
 import 'package:parklink/providers/parking_provider.dart';
@@ -10,10 +11,72 @@ import 'package:parklink/utils/app_text_input_fields.dart';
 import 'package:parklink/utils/buttons.dart';
 import 'package:provider/provider.dart';
 
-class MakeBookingBottomSheet extends StatelessWidget{
+class MakeBookingBottomSheet extends StatefulWidget{
   final String slotType;
-  // final Parking parking;
-  const MakeBookingBottomSheet({super.key, required this.slotType});
+  final Parking parking;
+  const MakeBookingBottomSheet({super.key, required this.slotType, required this.parking});
+
+
+  @override
+  MakeBookingBottomSheetState createState ()=> MakeBookingBottomSheetState();
+}
+
+
+class MakeBookingBottomSheetState extends State<MakeBookingBottomSheet>{
+
+
+  late final TextEditingController slotsCountController;
+  late final TextEditingController durationController;
+
+
+  DateTime? startDate;
+  late double  totalCost;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    totalCost = 1.0*(widget.slotType.toLowerCase()== "bike"? 
+       widget.parking.bikeNightCost:
+       widget.slotType.toLowerCase()== "cars"? 
+       widget.parking.bikeNightCost: widget.parking.truckNightCost);
+    slotsCountController = TextEditingController(text: "1");
+    durationController = TextEditingController(text: "1");
+    
+    slotsCountController.addListener(
+      (){
+        setState(() {
+          totalCost = 1.0*(widget.slotType.toLowerCase()== "bike"? 
+       widget.parking.bikeNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text):
+       widget.slotType.toLowerCase()== "cars"? 
+       widget.parking.bikeNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text): widget.parking.truckNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text));
+        });
+      }
+    );
+
+    durationController.addListener(
+      (){
+        setState(() {
+          totalCost = 1.0*(widget.slotType.toLowerCase()== "bike"? 
+       widget.parking.bikeNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text):
+       widget.slotType.toLowerCase()== "cars"? 
+       widget.parking.bikeNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text): widget.parking.truckNightCost* int.parse(slotsCountController.text)* int.parse(durationController.text));
+        });
+      }
+    );
+  
+
+  }
+
+
+
+  @override
+  void dispose() {
+    slotsCountController.dispose();
+    durationController.dispose();
+    super.dispose();
+  }
 
 
   @override
@@ -83,7 +146,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
-                unitInfo(label: "Slot Type", value: "$slotType"),
+                unitInfo(label: "Slot Type", value: widget.slotType),
                 unitInfo(label: "UnitCost Per Night", value: "5000 ugx"),
                 Container(
                     decoration: BoxDecoration(
@@ -94,7 +157,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
 
                     child: Row(
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             "Slots Count",
                             style: AppStyles.normalBlackTextStyle,
@@ -109,7 +172,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
                             keyboardType: TextInputType.number,
                             borderRadius: 20, 
                             btnHeight: 45, 
-                            controller: TextEditingController()),
+                            controller: slotsCountController),
                         )
                       ],
                     ),
@@ -119,7 +182,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
                   SizedBox(
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                             "Start Date",
                             style: AppStyles.normalBlackTextStyle,
                           ),
@@ -128,7 +191,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
                               enabled: true,
                               readOnly: true,
                               onTap: ()=> showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime(2050)),
-                              decoration: InputDecoration(
+                              decoration:const  InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Select date",
                                 hintStyle: AppStyles.normalGreyTextStyle
@@ -137,8 +200,37 @@ class MakeBookingBottomSheet extends StatelessWidget{
                       ],
                     ),
                   ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white
+                    ),
+                    // padding: const EdgeInsets.symmetric(10),
 
-                  unitInfo(label: "Total Cost", value: "0 ugx"),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            "Duration (days)",
+                            style: AppStyles.normalBlackTextStyle,
+                          )),
+                        SizedBox(
+                          width: 160,
+                          child: DSolidTextInputField(
+                            hintText: "Number of days", 
+                            hintTextStyle: AppStyles.normalGreyTextStyle, 
+                            valueTextStyle: AppStyles.normalBlackTextStyle, 
+                            bgColor: AppColors.softWhiteColor, 
+                            keyboardType: TextInputType.number,
+                            borderRadius: 20, 
+                            btnHeight: 45, 
+                            controller: durationController),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  unitInfo(label: "Total Cost", value: "$totalCost ugx"),
               ],
             ),
           ),
@@ -151,7 +243,7 @@ class MakeBookingBottomSheet extends StatelessWidget{
             borderRadius: 20, 
             textStyle: AppStyles.normalWhiteTextStyle, 
             onClick:(){
-              Navigator.pop(context);
+              makeBooking(context, value, value2);
             }),
           const SizedBox(height: 10,),
 
@@ -197,4 +289,57 @@ class MakeBookingBottomSheet extends StatelessWidget{
         ],
       ),
     );
+
+
+  Future<void> makeBooking(
+    BuildContext context,
+    UserProvider userProvider, 
+    BookingProvider bookingProvider
+    ) async{
+
+      if(slotsCountController.text.isEmpty || durationController.text.isEmpty){
+        Fluttertoast.showToast(msg: "Fill in valid values please");
+        return;
+      }else if(int.parse(slotsCountController.text)<1 || int.parse(durationController.text)<1){
+        Fluttertoast.showToast(msg: "Fill in values greater than 0");
+      }else{
+
+        final res = await bookingProvider.bookingRepository.makeBooking(
+          userId: userProvider.user!.id, 
+          slotsCount: int.parse(slotsCountController.text), 
+          slotsType: widget.slotType, 
+          duration: int.parse(durationController.text), 
+          unitNightCost: totalCost/int.parse(durationController.text), 
+          startDate: startDate?? DateTime.now(), 
+          parkingId: widget.parking.id);
+
+
+        if(res!=null){
+          await showDialog(
+            context: context, 
+            builder: (context)
+             => AlertDialog(
+              title: const Text("Booking", style: AppStyles.normalBoldBlackTextStyle,),
+              content: const Text("the booking fee shall be deducted from your mobile money.", style: AppStyles.smallBlackTextStyle,),
+              actions: [
+                DSolidButton(
+                  label: "Confirm", 
+                  btnHeight: 45, 
+                  bgColor: AppColors.primaryColor, 
+                  borderRadius: 15, 
+                  textStyle: AppStyles.normalWhiteTextStyle, 
+                  onClick: ()=> Navigator.pop(context))
+              ],
+             ),);
+          Fluttertoast.showToast(msg: "Booking made succesfully");
+          Navigator.pop(context);
+          // Navigator.pushNamed(context, RouteGenerator.bookingsScreen);
+        }else{
+          Fluttertoast.showToast(msg: "Booking failed");
+        }
+      }
+        
+      
+
+    }
 }

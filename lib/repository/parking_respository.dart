@@ -8,6 +8,7 @@ class ParkingRespository{
 
   Future<List<Parking>> getAllParkings()async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/all");
+    // final uri = Uri.parse("http://localhost:5000/api/v1/parking/all");
 
     try{
       final res = await http.get(uri);
@@ -21,7 +22,7 @@ class ParkingRespository{
         return [];
       }
     }catch(e){
-      print("::::::>>>>>  Error fetching parkings....");
+      print("::::::>>>>>  Error fetching parkings....   $e");
       return [];
     }
   }
@@ -31,7 +32,7 @@ class ParkingRespository{
     required int parkingId
   }) async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/delete/$parkingId");
-
+    // final uri = Uri.parse("http://localhost:5000/api/v1/parking/delete/$parkingId");
     try{
       final res = await http.delete(uri);
 
@@ -60,9 +61,12 @@ class ParkingRespository{
     required double truckNightCost,
     required double bikeNightCost,
     required String location,
-    required int userId
+    required int userId,
+    required double lng,
+    required double lat
   }) async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/parking/add");
+    // final uri = Uri.parse("http://localhost:5000/api/v1/parking/add");
 
     final payload = {
       "title": title,
@@ -73,7 +77,9 @@ class ParkingRespository{
       "carNightCost": carNightCost,
       "truckNightCost": truckNightCost,
       "location": location,
-      "userId": userId
+      "userId": userId,
+      "lng": lng,
+      "lat": lat
     };
 
 
@@ -99,4 +105,7 @@ class ParkingRespository{
     }
 
   }
+
+
+  
 }

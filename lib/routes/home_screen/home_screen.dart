@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:parklink/module/parking.dart';
 import 'package:parklink/providers/booking_provider.dart';
 import 'package:parklink/providers/parking_provider.dart';
@@ -54,21 +55,23 @@ class HomeScreenState extends State<HomeScreen>{
                   SizedBox(
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
                                 child: Row(
                                   children: [
-                                    Text("Your current location", style: AppStyles.smallGreyTextStyle,),
-                                    SizedBox(width: 5,),
-                                    Icon(Icons.keyboard_arrow_down_sharp, color: Colors.white,)
+                                    const Text("Your current location", style: AppStyles.smallGreyTextStyle,),
+                                    const SizedBox(width: 5,),
+                                    GestureDetector(
+                                      onTap: (){},
+                                      child: const Icon(Icons.keyboard_arrow_down_sharp, color: Colors.white,))
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 5,),
-                              SizedBox(
+                              const SizedBox(height: 5,),
+                              const SizedBox(
                                 child: Row(
                                   children: [
                                     Icon(Icons.location_on, color: Colors.white,),

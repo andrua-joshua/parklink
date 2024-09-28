@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parklink/module/parking.dart';
+import 'package:parklink/route.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 
@@ -29,7 +33,9 @@ class SearchWidget extends StatelessWidget{
             )
         )),
         const SizedBox(width: 20,),
-        Container(
+        GestureDetector(
+          onTap: ()=>Navigator.pushNamed(context, RouteGenerator.parkingMapScreen),
+          child:Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15)
@@ -38,7 +44,7 @@ class SearchWidget extends StatelessWidget{
           child: const Icon(
             Icons.location_searching_outlined
           ),
-        ),
+        )),
       ],
     );
   }
@@ -112,6 +118,32 @@ class UnitRecentPlacesState extends State<UnitRecentPlaces>{
 
   
 
+
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  late final CameraPosition _kGooglePlex;
+
+  late final CameraPosition _kLake;
+
+  
+  @override
+  void initState() {
+    super.initState();
+
+    _kGooglePlex = CameraPosition(
+      target:  LatLng(widget.parking.lat, widget.parking.lng),
+      zoom: 1.4746,
+    );
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -151,10 +183,27 @@ class UnitRecentPlacesState extends State<UnitRecentPlaces>{
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage("assets/map.jpg"))
+                // image: DecorationImage(
+                //   fit: BoxFit.cover,
+                //   image: AssetImage("assets/map.jpg"))
               ),
+
+              child: GoogleMap(
+                  mapType: MapType.hybrid,
+                  markers: {
+                    Marker(
+                      markerId: MarkerId("${widget.parking.id}"),
+                      infoWindow: InfoWindow(
+                        title: widget.parking.title,
+                        snippet: widget.parking.location
+                      ))
+                  },
+                  initialCameraPosition: _kGooglePlex,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  
+                ),
             ))
         ],
       ),

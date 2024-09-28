@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:parklink/module/booking.dart';
 import 'package:parklink/module/parking.dart';
+import 'package:parklink/providers/booking_provider.dart';
 import 'package:parklink/providers/user_provider.dart';
 import 'package:parklink/route.dart';
 import 'package:parklink/routes/all_parkings_screen/widget/Items_search_deleget.dart';
@@ -26,8 +28,8 @@ class BookingsScreenState extends State<BookingsScreen>{
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, value, child)
+    return Consumer2<UserProvider, BookingProvider>(
+      builder: (context, value, value2, child)
        => Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -47,16 +49,43 @@ class BookingsScreenState extends State<BookingsScreen>{
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: value.user!=null? SingleChildScrollView(
-            child: Column(
-              children: List.generate(
-                widget.isUserParking?
-                widget.parking!.bookings.length
-                : value.user!.bookings.length , (x)=> UnitBookingItem(
-                  booking: widget.isUserParking?
-                widget.parking!.bookings[x]
-                : value.user!.bookings[x],
-                )),
-            ),
+            child: FutureBuilder<List<Booking>>(
+              future: widget.isUserParking? 
+                value2.bookingRepository.fetchParkingBookings(parkingId: widget.parking?.id??5)
+                :value2.bookingRepository.fetchUserBookings(userId: value.user!.id),
+              builder: (context, snapshot) {
+                
+                if(snapshot.hasData){
+                  final data = snapshot.data ;
+                  print("::::DDDDDDDDD   $data :::: ${widget.parking}");
+                  return Column(
+                    children: List.generate(
+                      data!.length , (x)=> UnitBookingItem(
+                        booking: data[x],
+                      )),
+                  );
+
+                }
+
+
+                if(snapshot.hasError){
+                  return const Center(child:Text("Failed to fetch data", style: AppStyles.normalGreyTextStyle,));
+                }
+
+                return const Center(
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            )
+
+            
+            
+            
+            ,
           ):Center(
             child: DSolidButton(
               label: "Login", 

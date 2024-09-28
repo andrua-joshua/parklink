@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parklink/module/parking.dart';
 import 'package:parklink/module/user.dart';
 import 'package:parklink/providers/parking_provider.dart';
 import 'package:parklink/providers/user_provider.dart';
 import 'package:parklink/route.dart';
+import 'package:parklink/routes/bookings_screen/bookings_screen.dart';
 import 'package:parklink/routes/home_screen/widgets/home_screen_widgets.dart';
 import 'package:parklink/routes/parking_details_screen/widgets/parking_details_widget.dart';
 import 'package:parklink/utils/app_colors.dart';
@@ -38,6 +42,24 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
   ]; 
 
   bool isLoading = false;
+
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  late final CameraPosition _kGooglePlex;
+
+  late final CameraPosition _kLake;
+
+  
+  @override
+  void initState() {
+    super.initState();
+
+    _kGooglePlex = CameraPosition(
+      target:  LatLng(widget.parking.lat, widget.parking.lng),
+      zoom: 1.4746,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,11 +101,28 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
                   ),
 
               const SizedBox(height: 10,),
-              Expanded(child: Container(
+              Expanded(
+                child: Container(
                 constraints:  const BoxConstraints.expand(),
                 decoration: BoxDecoration(
                   color: AppColors.softWhiteColor,
                   borderRadius: BorderRadius.circular(15)
+                ),
+                child: GoogleMap(
+                  mapType: MapType.hybrid,
+                  markers: {
+                    Marker(
+                      markerId: MarkerId("${widget.parking.id}"),
+                      infoWindow: InfoWindow(
+                        title: widget.parking.title,
+                        snippet: widget.parking.location
+                      ))
+                  },
+                  initialCameraPosition: _kGooglePlex,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  
                 ),
               )),
               const SizedBox(height: 10,),
@@ -104,7 +143,9 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
                   onClick: ()=> showModalBottomSheet(
                     isScrollControlled: true,
                     context: context, 
-                    builder: (context)=> MakeBookingBottomSheet(slotType: types[currentSelected])))):
+                    builder: (context)=> MakeBookingBottomSheet(
+                      parking: widget.parking,
+                      slotType: types[currentSelected])))):
               LayoutBuilder(
                 builder: (context, constraints) {
                   double width = constraints.maxWidth*0.46;
@@ -152,7 +193,11 @@ class ParkingDetailsScreenState extends State<ParkingDetailsScreen>{
                         bgColor: AppColors.primaryColor, 
                         borderRadius: 20, 
                         textStyle: AppStyles.normalWhiteTextStyle, 
-                        onClick: ()=> Navigator.pushNamed(context, RouteGenerator.bookingsScreen, arguments: true)))
+                        onClick: (){}
+                        // => Navigator.push(context, MaterialPageRoute(
+                        //   builder: (context)=> BookingsScreen(isUserParking: true, parking: widget.parking,))) 
+                          )
+                          )
                     ],
                   );
                 },),

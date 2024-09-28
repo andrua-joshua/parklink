@@ -33,10 +33,10 @@ class Booking{
       slotsType: json['slotsType'], 
       duration: json['duration'], 
       startDate: json['startDate']??"", 
-      location: json['location'],
-      username: json['username'],
-      email: json['email'],
-      parkingTitle: json['parkingTitle'],
+      location: json['location']??"",
+      username: json['username']??"",
+      email: json['email']??"",
+      parkingTitle: json['parkingTitle']??"",
       unitNightCost: json['unitNightCost']);
   
 

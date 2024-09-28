@@ -12,6 +12,7 @@ class AuthRepository{
     required String password
   }) async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/auth/login");
+    // final uri = Uri.parse("http://localhost:5000/api/v1/auth/login");
 
     final payload = {
       "email": email,
@@ -49,6 +50,7 @@ class AuthRepository{
     required int userId,
   }) async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/auth/fetchUser/$userId");
+    // final uri = Uri.parse("http://localhost:5000/api/v1/auth/fetchUser/$userId");
 
   
 
@@ -79,6 +81,7 @@ class AuthRepository{
     required String password
   }) async{
     final uri = Uri.parse("http://154.72.206.212:5000/api/v1/auth/signup");
+    // final uri = Uri.parse("http://localhost:5000/api/v1/auth/signup");
 
     final payload = {
       "email": email,

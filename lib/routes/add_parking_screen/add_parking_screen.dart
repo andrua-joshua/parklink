@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:parklink/module/location.dart';
 import 'package:parklink/providers/parking_provider.dart';
 import 'package:parklink/providers/user_provider.dart';
+import 'package:parklink/repository/geolocation_service.dart';
 import 'package:parklink/utils/app_colors.dart';
 import 'package:parklink/utils/app_styles.dart';
 import 'package:parklink/utils/app_text_input_fields.dart';
@@ -363,7 +365,14 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                      && truckCostController.text.isNotEmpty
                      && locationController.text.isNotEmpty ){
 
+                        LocationModule? location;
 
+                        try{
+                          location = await GeolocationServiceGeolocatorApi().getCurrentLocation();
+                        }catch(err){
+                          Fluttertoast.showToast(msg: "Failed to get location:: $err");
+                        }
+                        
                         final parking =  await value2.parkingRespository.addParking(
                           title: titleController.text, 
                           carSlots: int.parse(carSlotsController.text), 
@@ -373,9 +382,12 @@ class AddParkingScreenState extends State<AddParkingScreen>{
                           truckNightCost: double.parse(truckCostController.text), 
                           bikeNightCost: double.parse(bikeCostController.text), 
                           location: locationController.text, 
-                          userId: value.user!.id);
+                          userId: value.user!.id,
+                          lng: location?.long?? 32.6621247,
+                          lat: location?.lat??0.3491314);
 
                         
+                          print(":::: Finished adding the parking");
 
                         final user = await value.authRepository.fetchUser(
                           userId: value.user!.id
