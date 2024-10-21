@@ -22,7 +22,7 @@ class ParkingRespository{
       }else{
         return [];
       }
-    }catch(e){
+      }catch(e){
       print("::::::>>>>>  Error fetching parkings....   $e");
       return [];
     }

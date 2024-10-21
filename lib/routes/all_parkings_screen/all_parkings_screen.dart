@@ -51,7 +51,7 @@ class AllParkingsScreenState extends State<AllParkingsScreen>{
                   return data!.length>0? SingleChildScrollView(
                       child: Column(
                         children: List.generate(
-                          data!.length>3? 3: data.length , (x)=> Padding(
+                           data!.length , (x)=> Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: UnitParkingItem(
                               parking: data[x],

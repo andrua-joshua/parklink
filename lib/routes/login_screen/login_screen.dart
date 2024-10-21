@@ -109,7 +109,8 @@ class LoginScreenState extends State<LoginScreen>{
                     if(emailController.text.isNotEmpty
                      && passwordController.text.isNotEmpty){
 
-                        final user = await value.authRepository.login(
+                        if(validateEmail(emailController.text)){
+                          final user = await value.authRepository.login(
                           email: emailController.text, 
                           password: passwordController.text);
                         
@@ -117,6 +118,9 @@ class LoginScreenState extends State<LoginScreen>{
                           value.user = user;
                           value.notifyAll();
                           Navigator.pushNamed(context, RouteGenerator.homeScreen);
+                        }
+                        }else{
+                          Fluttertoast.showToast(msg: "Enter a valid email please");
                         }
                     }else{
                       Fluttertoast.showToast(msg: "Fill in the fields");
@@ -142,5 +146,15 @@ class LoginScreenState extends State<LoginScreen>{
           ),)),
     ),);
   }
+
+
+
+    bool validateEmail(String email) {
+    String pattern =
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
 
 }

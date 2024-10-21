@@ -128,7 +128,9 @@ class SignupScreenState extends State<SignupScreen>{
                     if(emailController.text.isNotEmpty
                      && passwordController.text.isNotEmpty && usernameController.text.isNotEmpty){
 
-                        final user = await value.authRepository.signup(
+                        if(validateEmail(emailController.text)){
+                          if(passwordController.text.length>7) {
+                            final user = await value.authRepository.signup(
                           email: emailController.text, 
                           username: usernameController.text,
                           password: passwordController.text);
@@ -137,6 +139,12 @@ class SignupScreenState extends State<SignupScreen>{
                           value.user = user;
                           value.notifyAll();
                           Navigator.pushNamed(context, RouteGenerator.homeScreen);
+                        }
+                        }else{
+                          Fluttertoast.showToast(msg: "Password should be atleast 8 characters long");
+                        }
+                        }else{
+                          Fluttertoast.showToast(msg: "Eneter a valid email");
                         }
                     }else{
                       Fluttertoast.showToast(msg: "Fill in the fields");
@@ -162,4 +170,14 @@ class SignupScreenState extends State<SignupScreen>{
           ),)),
     ),);
   }
+
+
+
+    bool validateEmail(String email) {
+    String pattern =
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
 }
